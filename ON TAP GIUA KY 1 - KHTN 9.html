@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ÔN TẬP GIỮA KỲ I - KHOA HỌC TỰ NHIÊN 9</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            phys: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+            chem: { 50: '#fdf4ff', 100: '#fae8ff', 500: '#d946ef', 600: '#c026d3', 700: '#a21caf' },
+            bio: { 50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+    .scrollbar-thin::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-2xl shadow-inner">
+          ⚡
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold tracking-tight">TRƯỜNG THCS THÀNH ĐÔNG</h1>
+          <p class="text-xs sm:text-sm text-blue-100">ĐỀ CƯƠNG ÔN TẬP GIỮA KỲ I - MÔN KHOA HỌC TỰ NHIÊN LỚP 9</p>
+        </div>
+      </div>
+      
+      <!-- Score Counter & Quick Reset -->
+      <div class="flex items-center gap-3">
+        <div class="bg-white/15 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/20 text-xs sm:text-sm flex items-center gap-2">
+          <i class="fa-solid fa-trophy text-amber-300"></i>
+          <span>Điểm số: <strong id="score-counter" class="text-amber-200">0</strong></span>
+        </div>
+        <button onclick="resetAllProgress()" class="bg-white/20 hover:bg-white/30 text-xs px-3 py-1.5 rounded-lg transition duration-200 flex items-center gap-1.5" title="Làm lại từ đầu">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span class="hidden sm:inline">Làm lại</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs for 3 Subjects -->
+    <div class="max-w-6xl mx-auto px-4 flex space-x-2 border-t border-white/10 pt-2 overflow-x-auto scrollbar-thin">
+      <button onclick="switchTab('physics')" id="tab-btn-physics" class="tab-btn flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-t-lg transition border-b-2 border-white bg-white/15 text-white">
+        ⚡ Vật Lí 9 <span class="bg-blue-900/80 text-blue-100 text-xs px-2 py-0.5 rounded-full" id="phys-count">8 bài</span>
+      </button>
+      <button onclick="switchTab('chemistry')" id="tab-btn-chemistry" class="tab-btn flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-t-lg transition border-b-2 border-transparent text-blue-100 hover:text-white hover:bg-white/10">
+        🧪 Hóa Học 9 <span class="bg-purple-900/80 text-purple-100 text-xs px-2 py-0.5 rounded-full" id="chem-count">29 bài</span>
+      </button>
+      <button onclick="switchTab('biology')" id="tab-btn-biology" class="tab-btn flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-t-lg transition border-b-2 border-transparent text-blue-100 hover:text-white hover:bg-white/10">
+        🧬 Sinh Học 9 <span class="bg-emerald-900/80 text-emerald-100 text-xs px-2 py-0.5 rounded-full" id="bio-count">12 bài</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Filter & Sub-Nav Bar -->
+  <div class="bg-white border-b border-slate-200 shadow-sm sticky top-[100px] sm:top-[106px] z-40">
+    <div class="max-w-6xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+      <div class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-thin">
+        <span class="text-slate-500 font-medium whitespace-nowrap"><i class="fa-solid fa-filter mr-1"></i>Lọc dạng bài:</span>
+        <button onclick="filterType('all')" class="filter-pill bg-indigo-600 text-white px-2.5 py-1 rounded-full font-medium" data-filter="all">Tất cả</button>
+        <button onclick="filterType('mcq')" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium" data-filter="mcq">Trắc nghiệm</button>
+        <button onclick="filterType('tf')" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium" data-filter="tf">Đúng / Sai</button>
+        <button onclick="filterType('short')" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium" data-filter="short">Trả lời ngắn</button>
+        <button onclick="filterType('essay')" class="filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium" data-filter="essay">Tự luận</button>
+      </div>
+
+      <div class="text-slate-500 text-xs hidden md:flex items-center gap-2">
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Đã hoàn thành</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block"></span> Chưa làm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full">
+    <!-- Instruction Banner -->
+    <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl flex items-start gap-3 shadow-sm">
+      <div class="text-indigo-600 text-xl mt-0.5"><i class="fa-solid fa-lightbulb"></i></div>
+      <div class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+        <strong>Hướng dẫn ôn tập lớp 9:</strong> Đọc kĩ từng câu hỏi, vận dụng công thức vật lí, phương trình hoá học và sơ đồ lai Men-đen để tự giải. Nhấn <strong>Gợi ý</strong> nếu cần định hướng và nhấn <strong>Đối chiếu đáp án mẫu</strong> ở phần tự luận để tự đánh giá mức độ hiểu bài của mình!
+      </div>
+    </div>
+
+    <!-- Subject Containers -->
+    <div id="subject-physics" class="subject-section space-y-6"></div>
+    <div id="subject-chemistry" class="subject-section hidden space-y-6"></div>
+    <div id="subject-biology" class="subject-section hidden space-y-6"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs sm:text-sm text-slate-500">
+    <div class="max-w-6xl mx-auto px-4">
+      <p class="font-medium text-slate-700">Tài liệu ôn tập tương tác AI - Giáo viên: Nguyễn Thế Phương - Trường THCS Thành Đông</p>
+      <p class="mt-1 text-slate-400">Hỗ trợ học sinh lớp 9 ôn tập kiến thức cốt lõi, tự tin đạt kết quả cao trong kỳ thi Giữa học kỳ 1.</p>
+    </div>
+  </footer>
+
+  <!-- Custom Confirmation Modal -->
+  <div id="custom-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 text-center">
+      <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="font-bold text-slate-800 text-base mb-1">Xác nhận</h3>
+      <p id="modal-desc" class="text-xs text-slate-600 mb-5 leading-relaxed"></p>
+      <div class="flex gap-2 justify-center">
+        <button id="modal-cancel-btn" class="px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold rounded-xl transition">Hủy bỏ</button>
+        <button id="modal-confirm-btn" class="px-4 py-2 bg-rose-600 text-white hover:bg-rose-700 text-xs font-semibold rounded-xl transition">Đồng ý</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div id="toast-box" class="fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 pointer-events-none transition-all duration-300 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-lg text-xs flex items-center gap-2 max-w-xs">
+    <i class="fa-solid fa-circle-info text-emerald-400 text-sm"></i>
+    <span id="toast-text"></span>
+  </div>
+
+  <!-- Application Logic & Question Bank -->
+  <script>
+    const questionBank = {
+      // ==========================================
+      // VẬT LÝ 9
+      // ==========================================
+      physics: [
+        // BÀI 2: ĐỘNG NĂNG VÀ THẾ NĂNG - TRẢ LỜI NGẮN
+        {
+          id: 'phys-sa-1',
+          type: 'short',
+          section: 'BÀI 2: ĐỘNG NĂNG VÀ THẾ NĂNG (TRẢ LỜI NGẮN)',
+          question: 'Câu 1: Một vật có khối lượng 0,5 kg chuyển động với tốc độ 6 m/s. Động năng của vật có giá trị là bao nhiêu Jun (J)?',
+          expected: ['9', '9J', '9 J'],
+          hint: 'Áp dụng công thức tính động năng: Wđ = 1/2 * m * v²',
+          explanation: 'Áp dụng công thức: Wđ = 1/2 * m * v² = 0,5 * 0,5 * 6² = 0,25 * 36 = 9 (J).'
+        },
+        {
+          id: 'phys-sa-2',
+          type: 'short',
+          section: 'BÀI 2: ĐỘNG NĂNG VÀ THẾ NĂNG (TRẢ LỜI NGẮN)',
+          question: 'Câu 2: Một quả bóng có khối lượng 0,5 kg đang di chuyển với tốc độ 2 m/s. Động năng của quả bóng là bao nhiêu Jun (J)?',
+          expected: ['1', '1J', '1 J'],
+          hint: 'Thay số vào công thức Wđ = 1/2 * m * v²',
+          explanation: 'Áp dụng công thức: Wđ = 1/2 * m * v² = 0,5 * 0,5 * 2² = 0,25 * 4 = 1 (J).'
+        },
+        {
+          id: 'phys-sa-3',
+          type: 'short',
+          section: 'BÀI 2: ĐỘNG NĂNG VÀ THẾ NĂNG (TRẢ LỜI NGẮN)',
+          question: 'Câu 3: Một quả bóng có khối lượng 0,5 kg được đặt ở độ cao 4m so với mặt đất (lấy g = 10 m/s²). Thế năng trọng trường của quả bóng bằng bao nhiêu Jun (J)?',
+          expected: ['20', '20J', '20 J'],
+          hint: 'Công thức thế năng trọng trường: Wt = P * h = m * g * h',
+          explanation: 'Thế năng trọng trường của quả bóng: Wt = P * h = 10 * m * h = 10 * 0,5 * 4 = 20 (J).'
+        },
+
+        // BÀI 4: CÔNG - CÔNG SUẤT - ĐÚNG / SAI
+        {
+          id: 'phys-tf-1',
+          type: 'tf',
+          section: 'BÀI 4: CÔNG – CÔNG SUẤT (TRẮC NGHIỆM ĐÚNG - SAI)',
+          prompt: 'Câu 1: Trong các phát biểu sau về công cơ học, đâu là phát biểu đúng, đâu là phát biểu sai?',
+          statements: [
+            { id: 's1', text: 'a) Công cơ học là số đo năng lượng mà vật mất đi hoặc nhận vào do tương tác với vật khác.', isCorrect: true, rationale: 'Đúng: Công cơ học là số đo phần năng lượng được truyền từ vật này sang vật khác qua tác dụng của lực.' },
+            { id: 's2', text: 'b) Công cơ học luôn có giá trị dương vì lực luôn cùng chiều với quãng đường dịch chuyển.', isCorrect: false, rationale: 'Sai: Khi lực cản trở chuyển động (ngược chiều dịch chuyển), công cơ học có giá trị âm (công cản).' },
+            { id: 's3', text: 'c) Khi lực tác dụng lên vật bằng 1 N và quãng đường dịch chuyển là 1 m cùng hướng với lực, công thực hiện được là 1 J.', isCorrect: true, rationale: 'Đúng: A = F * s = 1 N * 1 m = 1 J.' },
+            { id: 's4', text: 'd) Đơn vị của công là Oát (W).', isCorrect: false, rationale: 'Sai: Đơn vị của công là Jun (J), Oát (W) là đơn vị của công suất.' }
+          ]
+        },
+        {
+          id: 'phys-tf-2',
+          type: 'tf',
+          section: 'BÀI 4: CÔNG – CÔNG SUẤT (TRẮC NGHIỆM ĐÚNG - SAI)',
+          prompt: 'Câu 2: Trong các phát biểu sau về công suất, đâu là phát biểu đúng, đâu là phát biểu sai?',
+          statements: [
+            { id: 's1', text: 'a) Công suất là đại lượng đo tốc độ thực hiện công trong một đơn vị thời gian.', isCorrect: true, rationale: 'Đúng: Công suất đặc trưng cho tốc độ sinh công P = A / t.' },
+            { id: 's2', text: 'b) Đơn vị của công suất là Jun (J).', isCorrect: false, rationale: 'Sai: Đơn vị của công suất là Oát (W) hoặc J/s, Jun (J) là đơn vị của công.' },
+            { id: 's3', text: 'c) Công suất càng lớn, công thực hiện trong cùng một khoảng thời gian càng ít.', isCorrect: false, rationale: 'Sai: Với cùng một khoảng thời gian, công suất càng lớn thì công thực hiện được càng nhiều (A = P * t).' },
+            { id: 's4', text: 'd) 1 W tương đương với việc thực hiện 1 J công trong 1 giây.', isCorrect: true, rationale: 'Đúng: 1 W = 1 J / 1 s.' }
+          ]
+        },
+        {
+          id: 'phys-tf-3',
+          type: 'tf',
+          section: 'BÀI 4: CÔNG – CÔNG SUẤT (TRẮC NGHIỆM ĐÚNG - SAI)',
+          prompt: 'Câu 3: Trong các phát biểu sau về công và công suất, phát biểu nào đúng, phát biểu nào sai?',
+          statements: [
+            { id: 's1', text: 'a) Đơn vị của công suất là Jun (J).', isCorrect: false, rationale: 'Sai: Đơn vị của công suất là Oát (W).' },
+            { id: 's2', text: 'b) Công suất là đại lượng đo tốc độ thực hiện công.', isCorrect: true, rationale: 'Đúng: Công suất cho biết công được thực hiện nhanh hay chậm.' },
+            { id: 's3', text: 'c) Đơn vị của công là Jun (J).', isCorrect: true, rationale: 'Đúng: Công có đơn vị đo là Jun (J).' },
+            { id: 's4', text: 'd) Công suất càng lớn, công thực hiện trong cùng một khoảng thời gian càng ít.', isCorrect: false, rationale: 'Sai: Công suất càng lớn thì công thực hiện trong cùng thời gian phải càng lớn.' }
+          ]
+        },
+
+        // BÀI 4: TỰ LUẬN
+        {
+          id: 'phys-es-1',
+          type: 'essay',
+          section: 'BÀI 4: CÔNG – CÔNG SUẤT (PHẦN TỰ LUẬN)',
+          question: 'Câu 1: Một động cơ thực hiện 9000 J trong thời gian 1 phút 30 giây. Công suất của động cơ là bao nhiêu?\n\nTóm tắt:\nCho A = 9000 (J); t = 1 phút 30 giây = 90 (s).\nTính P = ? (W)',
+          hint: 'Đổi thời gian ra giây: 1 phút 30 giây = 90 s. Sử dụng công thức P = A / t.',
+          modelAnswer: `Tóm tắt:\nA = 9000 J\nt = 1 phút 30 giây = 90 s\nP = ? (W)\n\nLời giải chi tiết:\nCông suất của động cơ là:\n   P = A / t = 9000 / 90 = 100 (W)\n\nĐáp số: 100 W (Oát).`
+        },
+        {
+          id: 'phys-es-2',
+          type: 'essay',
+          section: 'BÀI 4: CÔNG – CÔNG SUẤT (PHẦN TỰ LUẬN)',
+          question: 'Câu 2: Một công nhân dùng sức kéo một vật nặng lên cao, với công thực hiện là 2000 J trong thời gian 40 giây. Tính công suất cần thiết mà công nhân thực hiện?\n\nTóm tắt:\nCho A = 2000 (J); t = 40 (s).\nTính P = ? (W)',
+          hint: 'Sử dụng công thức tính công suất: P = A / t.',
+          modelAnswer: `Tóm tắt:\nA = 2000 J\nt = 40 s\nP = ? (W)\n\nLời giải chi tiết:\nCông suất cần thiết mà người công nhân thực hiện được là:\n   P = A / t = 2000 / 40 = 50 (W)\n\nĐáp số: 50 W (Oát).`
+        }
+      ],
+
+      // ==========================================
+      // HÓA HỌC 9
+      // ==========================================
+      chemistry: [
+        // BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI - TRẮC NGHIỆM
+        {
+          id: 'chem-mcq-1',
+          type: 'mcq',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 1: Kim loại dẫn điện tốt nhất là kim loại nào sau đây?',
+          options: [
+            { text: 'Silver (Bạc).', isCorrect: true },
+            { text: 'Gold (Vàng).', isCorrect: false },
+            { text: 'Tungsten (Vonfam).', isCorrect: false },
+            { text: 'Mercury (Thủy ngân).', isCorrect: false }
+          ],
+          hint: 'Thứ tự dẫn điện giảm dần của các kim loại thông dụng: Ag > Cu > Au > Al > Fe.',
+          rationale: 'Bạc (Silver - Ag) là kim loại có khả năng dẫn điện tốt nhất trong tất cả các kim loại.'
+        },
+        {
+          id: 'chem-mcq-2',
+          type: 'mcq',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 2: Kim loại nào sau đây có tính dẻo lớn nhất (có thể dát mỏng đến mức ánh sáng có thể lọt qua)?',
+          options: [
+            { text: 'Al (Nhôm).', isCorrect: false },
+            { text: 'Cu (Đồng).', isCorrect: false },
+            { text: 'Ag (Bạc).', isCorrect: false },
+            { text: 'Au (Vàng).', isCorrect: true }
+          ],
+          hint: 'Kim loại quý này có thể dát mỏng thành lá vàng mỏng đến 0,0001 mm.',
+          rationale: 'Vàng (Au) là kim loại có tính dẻo cao nhất, 1 gam vàng có thể dát thành lá mỏng diện tích hàng mét vuông.'
+        },
+        {
+          id: 'chem-mcq-3',
+          type: 'mcq',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 3: Dùng đồng để làm cột thu lôi chống sét vì đồng có tính chất nào?',
+          options: [
+            { text: 'Tính bền.', isCorrect: false },
+            { text: 'Tính ánh kim.', isCorrect: false },
+            { text: 'Tính dẫn điện.', isCorrect: true },
+            { text: 'Tính dẻo.', isCorrect: false }
+          ],
+          hint: 'Cột thu lôi cần dẫn dòng điện sét cực lớn xuống đất an toàn.',
+          rationale: 'Đồng dẫn điện rất tốt, giúp truyền dòng điện sét có cường độ rất cao từ trên cao xuống đất an toàn.'
+        },
+        {
+          id: 'chem-mcq-4',
+          type: 'mcq',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 4: Một bạn quan sát thấy bề mặt một vật sáng lấp lánh dưới ánh nắng. Đó có thể là bề mặt vật nào sau đây?',
+          options: [
+            { text: 'Viên bi nhựa.', isCorrect: false },
+            { text: 'Mảnh giấy nhôm.', isCorrect: true },
+            { text: 'Thanh đất sét.', isCorrect: false },
+            { text: 'Tờ giấy trắng.', isCorrect: false }
+          ],
+          hint: 'Các kim loại có các electron tự do phản xạ ánh sáng tạo ra vẻ sáng lấp lánh (ánh kim).',
+          rationale: 'Nhôm là kim loại có ánh kim nên khi ánh sáng mặt trời chiếu vào sẽ phản xạ tạo độ sáng lấp lánh.'
+        },
+        {
+          id: 'chem-mcq-5',
+          type: 'mcq',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 5: Dùng búa đập vào sợi dây nhôm, sợi dây bị cán mỏng dẹt ra mà không bị vỡ vụn. Điều này chứng tỏ nhôm có tính chất gì?',
+          options: [
+            { text: 'Tính dẻo.', isCorrect: true },
+            { text: 'Tính cứng.', isCorrect: false },
+            { text: 'Tính rắn chắc.', isCorrect: false },
+            { text: 'Tính bền.', isCorrect: false }
+          ],
+          hint: 'Khả năng bị biến dạng dưới tác dụng của lực cơ học mà không bị nứt vỡ.',
+          rationale: 'Nhôm có tính dẻo nên khi bị tác dụng lực gõ búa có thể dát mỏng, kéo sợi mà không gãy vụn.'
+        },
+        {
+          id: 'chem-mcq-6',
+          type: 'mcq',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 6: Kim loại X có nhiệt độ nóng chảy cao nhất (khoảng 3422°C), được sử dụng làm dây tóc bóng đèn sợi đốt. X là kim loại nào?',
+          options: [
+            { text: 'Silver (Bạc).', isCorrect: false },
+            { text: 'Gold (Vàng).', isCorrect: false },
+            { text: 'Tungsten (Vonfam).', isCorrect: true },
+            { text: 'Mercury (Thủy ngân).', isCorrect: false }
+          ],
+          hint: 'Kí hiệu hóa học là W.',
+          rationale: 'Tungsten (Vonfam - W) có nhiệt độ nóng chảy cao nhất trong các kim loại, chịu được nhiệt độ sợi tóc phát sáng mà không bị nóng chảy.'
+        },
+
+        // BÀI 18: ĐÚNG / SAI
+        {
+          id: 'chem-tf-1',
+          type: 'tf',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (ĐÚNG - SAI)',
+          hasExpVisual: true,
+          prompt: 'Câu 1: Hình mô tả hiện tượng thí nghiệm khi cho các kim loại tác dụng với dung dịch acid HCl (Đồng, Natri, Chì, Magnesium, Sắt). Cho các phát biểu sau, phát biểu nào đúng, phát biểu nào sai?',
+          statements: [
+            { id: 's1', text: 'A. Kim loại natri phản ứng với dung dịch HCl mãnh liệt nhất (bốc cháy trên mặt chất lỏng).', isCorrect: true, rationale: 'Đúng: Natri là kim loại kiềm rất hoạt động, phản ứng mãnh liệt với nước và acid giải phóng nhiệt lớn gây bốc cháy.' },
+            { id: 's2', text: 'B. Tất cả các kim loại trên khi tác dụng với HCl đều giải phóng khí H2.', isCorrect: false, rationale: 'Sai: Đồng (Cu) đứng sau hydrogen trong dãy hoạt động hóa học nên không tác dụng với dung dịch HCl loãng.' },
+            { id: 's3', text: 'C. Khả năng phản ứng theo chiều kim loại giảm dần: natri, magnesium, sắt, chì, đồng.', isCorrect: true, rationale: 'Đúng: Chiều hoạt động giảm dần: Na > Mg > Fe > Pb > Cu.' },
+            { id: 's4', text: 'D. Khả năng phản ứng của các kim loại với acid HCl là như nhau.', isCorrect: false, rationale: 'Sai: Mỗi kim loại có mức độ hoạt động hóa học khác nhau nên mức độ phản ứng rất khác nhau.' }
+          ]
+        },
+        {
+          id: 'chem-tf-2',
+          type: 'tf',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (ĐÚNG - SAI)',
+          prompt: 'Câu 2: Hãy xác định các nhận định dưới đây là Đúng (Đ) hay Sai (S) về tính chất hoá học của kim loại:',
+          statements: [
+            { id: 's1', text: 'a. Kim loại Na, K, Fe, Ag đều có khả năng phản ứng với khí oxygen ngay ở điều kiện thường.', isCorrect: false, rationale: 'Sai: Bạc (Ag) không phản ứng với oxygen ở điều kiện thường (kể cả khi nung nóng).' },
+            { id: 's2', text: 'b. Kim loại Na, K, Ca phản ứng mạnh với nước ở điều kiện thường giải phóng khí hydrogen.', isCorrect: true, rationale: 'Đúng: Na, K, Ca là các kim loại kiềm và kiềm thổ phản ứng mãnh liệt với nước tạo dung dịch kiềm và khí H2.' },
+            { id: 's3', text: 'c. Kim loại Au, Al, Cu không tan trong dung dịch HCl.', isCorrect: false, rationale: 'Sai: Nhôm (Al) tan mạnh trong dung dịch HCl giải phóng khí H2.' },
+            { id: 's4', text: 'd. Kim loại Fe mạnh hơn có thể đẩy Cu ra khỏi dung dịch muối.', isCorrect: true, rationale: 'Đúng: Fe đứng trước Cu trong dãy hoạt động nên Fe + CuSO4 -> FeSO4 + Cu.' }
+          ]
+        },
+        {
+          id: 'chem-tf-3',
+          type: 'tf',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (ĐÚNG - SAI)',
+          prompt: 'Câu 3: Hãy xác định các nhận định dưới đây là Đúng (Đ) hay Sai (S) về tính chất hoá học của kim loại:',
+          statements: [
+            { id: 's1', text: 'a. Fe tác dụng với nước ở nhiệt độ thường giải phóng khí hydrogen.', isCorrect: false, rationale: 'Sai: Sắt (Fe) không tác dụng với nước ở nhiệt độ thường, chỉ phản ứng với hơi nước ở nhiệt độ rất cao.' },
+            { id: 's2', text: 'b. Ag không tác dụng được với dung dịch acid (HCl, H2SO4 loãng), không giải phóng khí hydrogen.', isCorrect: true, rationale: 'Đúng: Ag đứng sau H trong dãy hoạt động hóa học nên không tác dụng với HCl/H2SO4 loãng.' },
+            { id: 's3', text: 'c. Kim loại Au, Zn, Ag không tan trong dung dịch HCl.', isCorrect: false, rationale: 'Sai: Kẽm (Zn) đứng trước H nên tan tốt trong HCl giải phóng H2.' },
+            { id: 's4', text: 'd. Kim loại Cu mạnh hơn có thể đẩy Mg ra khỏi dung dịch muối.', isCorrect: false, rationale: 'Sai: Cu hoạt động hóa học yếu hơn nhiều so với Mg nên không đẩy được Mg.' }
+          ]
+        },
+
+        // BÀI 18: TỰ LUẬN
+        {
+          id: 'chem-es-1',
+          type: 'essay',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (TỰ LUẬN)',
+          question: 'Câu 1: Cho 14,3 gam hỗn hợp hai kim loại Fe và Cu vào dung dịch HCl loãng dư, người ta thu được 4,958 lít khí ở điều kiện chuẩn (đkc: 25°C, 1 bar). Tính khối lượng các kim loại có trong hỗn hợp ban đầu?\n(Biết: Fe = 56; Cu = 64; H = 1; Cl = 35,5)',
+          hint: 'Chỉ có Fe phản ứng với HCl sinh ra H2, Cu không tan. Số mol khí H2 = V / 24,79.',
+          modelAnswer: `Phương trình hóa học:\nFe + 2HCl → FeCl2 + H2 ↑ (1)\nCu không phản ứng với dung dịch HCl.\n\n1. Tính số mol khí H2 thu được (ở đkc: 1 mol = 24,79 L):\n   nH2 = 4,958 / 24,79 = 0,2 (mol)\n\n2. Theo phương trình (1):\n   nFe = nH2 = 0,2 (mol)\n   Khối lượng Fe trong hỗn hợp là:\n   mFe = 0,2 × 56 = 11,2 (gam)\n\n3. Khối lượng Cu trong hỗn hợp là:\n   mCu = 14,3 - 11,2 = 3,1 (gam)\n\nĐáp số:\n- Khối lượng Fe: 11,2 g\n- Khối lượng Cu: 3,1 g`
+        },
+        {
+          id: 'chem-es-2',
+          type: 'essay',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (TỰ LUẬN)',
+          question: 'Câu 2: Cho 6,5 gam Zinc (Zn) tác dụng hoàn toàn với 400 mL dung dịch hydrochloric acid (HCl).\na. Tính thể tích khí H2 thu được ở điều kiện chuẩn (đkc).\nb. Tính nồng độ mol của dung dịch sau phản ứng (xem thể tích dung dịch thay đổi không đáng kể).\n(Biết: Zn = 65; H = 1; Cl = 35,5)',
+          hint: 'nZn = 6,5 / 65 = 0,1 mol. PTHH: Zn + 2HCl -> ZnCl2 + H2. V = 400 mL = 0,4 L.',
+          modelAnswer: `Phương trình hóa học:\nZn + 2HCl → ZnCl2 + H2 ↑\n\n1. Tính số mol Zn:\n   nZn = 6,5 / 65 = 0,1 (mol)\n\na. Tính thể tích khí H2 thu được (ở đkc):\n- Theo PTHH: nH2 = nZn = 0,1 (mol)\n- Thể tích H2: VH2 = 0,1 × 24,79 = 2,479 (Lít)\n\nb. Tính nồng độ mol của dung dịch sau phản ứng:\n- Dung dịch sau phản ứng chứa chất tan là ZnCl2.\n- Theo PTHH: nZnCl2 = nZn = 0,1 (mol)\n- Thể tích dung dịch: Vdd = 400 mL = 0,4 Lít\n- Nồng độ mol của dung dịch ZnCl2:\n   CM(ZnCl2) = n / V = 0,1 / 0,4 = 0,25 (M)\n\nĐáp số:\na) VH2 = 2,479 Lít\nb) CM(ZnCl2) = 0,25 M`
+        },
+        {
+          id: 'chem-es-3',
+          type: 'essay',
+          section: 'BÀI 18: TÍNH CHẤT CHUNG CỦA KIM LOẠI (TỰ LUẬN)',
+          question: 'Câu 3: Cho a gam Zinc (Zn) tác dụng vừa đủ với 200 mL dung dịch hydrochloric acid (HCl) 2M.\na. Tính thể tích khí H2 thu được ở điều kiện chuẩn (đkc).\nb. Tính giá trị khối lượng a gam Zinc cần dùng để hòa tan hết lượng acid trên?\n(Biết: Zn = 65; H = 1; Cl = 35,5)',
+          hint: 'nHCl = CM * V = 2 * 0,2 = 0,4 mol. PTHH: Zn + 2HCl -> ZnCl2 + H2.',
+          modelAnswer: `Phương trình hóa học:\nZn + 2HCl → ZnCl2 + H2 ↑\n\n1. Đổi thể tích và tính số mol HCl:\n   Vdd = 200 mL = 0,2 L\n   nHCl = CM × V = 2 × 0,2 = 0,4 (mol)\n\na. Tính thể tích khí H2 thu được (đkc):\n- Theo PTHH: nH2 = 1/2 × nHCl = 0,4 / 2 = 0,2 (mol)\n- Thể tích khí H2: VH2 = 0,2 × 24,79 = 4,958 (Lít)\n\nb. Tính khối lượng a gam Zinc:\n- Theo PTHH: nZn = 1/2 × nHCl = 0,2 (mol)\n- Khối lượng Zinc: a = mZn = 0,2 × 65 = 13 (gam)\n\nĐáp số:\na) VH2 = 4,958 Lít\nb) a = 13 gam`
+        },
+
+        // BÀI 19: DÃY HOẠT ĐỘNG HÓA HỌC - TRẮC NGHIỆM
+        {
+          id: 'chem-mcq-7',
+          type: 'mcq',
+          section: 'BÀI 19: DÃY HOẠT ĐỘNG HÓA HỌC (TRẮC NGHIỆM)',
+          question: 'Câu 1: Dãy kim loại nào sau đây được sắp xếp theo chiều mức độ hoạt động hóa học giảm dần?',
+          options: [
+            { text: 'Na, Mg, Zn.', isCorrect: true },
+            { text: 'Al, Zn, Na.', isCorrect: false },
+            { text: 'Mg, Al, Na.', isCorrect: false },
+            { text: 'Pb, Al, Mg.', isCorrect: false }
+          ],
+          hint: 'Ghi nhớ câu vần: Khi Bà Con Nào (Na) May (Mg) Áo Giáp (Zn) Có Sắt...',
+          rationale: 'Theo dãy hoạt động hóa học: Na đứng trước Mg, Mg đứng trước Zn nên chiều giảm dần là Na, Mg, Zn.'
+        },
+        {
+          id: 'chem-mcq-8',
+          type: 'mcq',
+          section: 'BÀI 19: DÃY HOẠT ĐỘNG HÓA HỌC (TRẮC NGHIỆM)',
+          question: 'Câu 2: Cho dãy các kim loại sau: Au, K, Mg, Ag, Fe, Cu. Có bao nhiêu kim loại đứng sau Hydrogen (H) trong dãy hoạt động hóa học?',
+          options: [
+            { text: '1.', isCorrect: false },
+            { text: '2.', isCorrect: false },
+            { text: '3.', isCorrect: true },
+            { text: '4.', isCorrect: false }
+          ],
+          hint: 'Các kim loại đứng sau H không tác dụng với dung dịch HCl để giải phóng H2.',
+          rationale: 'Các kim loại đứng sau H là: Cu, Ag, Au (tổng cộng có 3 kim loại).'
+        },
+        {
+          id: 'chem-mcq-9',
+          type: 'mcq',
+          section: 'BÀI 19: DÃY HOẠT ĐỘNG HÓA HỌC (TRẮC NGHIỆM)',
+          question: 'Câu 3: Cho dãy các kim loại sau: Au, K, Mg, Ag, Fe, Zn. Có bao nhiêu kim loại đẩy được Cu ra khỏi dung dịch CuCl2?',
+          options: [
+            { text: '1.', isCorrect: false },
+            { text: '2.', isCorrect: false },
+            { text: '3.', isCorrect: true },
+            { text: '4.', isCorrect: false }
+          ],
+          hint: 'Kim loại đứng trước Cu và không tác dụng với nước ở điều kiện thường (K tác dụng với nước trước).',
+          rationale: 'Các kim loại đẩy được Cu ra khỏi dung dịch CuCl2 là: Mg, Fe, Zn (3 kim loại). K tác dụng với nước trước sinh H2 và KOH; Au, Ag yếu hơn Cu.'
+        },
+        {
+          id: 'chem-mcq-10',
+          type: 'mcq',
+          section: 'BÀI 19: DÃY HOẠT ĐỘNG HÓA HỌC (TRẮC NGHIỆM)',
+          question: 'Câu 4: Khi thả một cây đinh sắt sạch vào dung dịch CuSO4 loãng, quan sát được hiện tượng nào sau đây?',
+          options: [
+            { text: 'Sủi bọt khí mạnh, màu xanh của dung dịch nhạt dần.', isCorrect: false },
+            { text: 'Sắt tan dần, có một lớp đồng màu đỏ phủ lên đinh sắt, màu xanh của dung dịch đậm dần.', isCorrect: false },
+            { text: 'Sắt tan dần, có một lớp đồng màu đỏ phủ lên đinh sắt, dung dịch không đổi màu.', isCorrect: false },
+            { text: 'Sắt tan dần, có một lớp đồng màu đỏ phủ lên đinh sắt, màu xanh của dung dịch nhạt dần.', isCorrect: true }
+          ],
+          hint: 'Phương trình: Fe + CuSO4 -> FeSO4 + Cu (CuSO4 có màu xanh, ion Cu2+ giảm dần).',
+          rationale: 'Fe đẩy Cu ra bám vào đinh sắt thành lớp màu đỏ gạch, nồng độ CuSO4 màu xanh lam giảm dần làm màu xanh nhạt dần.'
+        },
+        {
+          id: 'chem-mcq-11',
+          type: 'mcq',
+          section: 'BÀI 19: DÃY HOẠT ĐỘNG HÓA HỌC (TRẮC NGHIỆM)',
+          question: 'Câu 5: Cho thanh đồng vào dung dịch muối X không màu, thấy dung dịch xuất hiện màu xanh và có kim loại mới tạo thành bám trên thanh đồng. Muối X có thể là chất nào sau đây?',
+          options: [
+            { text: 'NaCl.', isCorrect: false },
+            { text: 'AlCl3.', isCorrect: false },
+            { text: 'Zn(NO3)2.', isCorrect: false },
+            { text: 'AgNO3.', isCorrect: true }
+          ],
+          hint: 'Đồng đứng trước Ag nên đẩy được Ag ra khỏi muối: Cu + 2AgNO3 -> Cu(NO3)2 (xanh) + 2Ag.',
+          rationale: 'Cu đẩy được ion Ag+ ra khỏi dung dịch AgNO3 không màu, tạo thành muối Cu(NO3)2 màu xanh lam và tinh thể Ag màu trắng xám bám ngoài thanh đồng.'
+        },
+        {
+          id: 'chem-mcq-12',
+          type: 'mcq',
+          section: 'BÀI 19: DÃY HOẠT ĐỘNG HÓA HỌC (TRẮC NGHIỆM)',
+          question: 'Câu 6: Cho một thanh kim loại Y vào dung dịch muối CuSO4 (màu xanh). Sau một thời gian thấy màu xanh nhạt dần và có vẩy đồng màu đỏ bám trên thanh kim loại Y. Y có thể là kim loại nào sau đây?',
+          options: [
+            { text: 'Cu.', isCorrect: false },
+            { text: 'Zn.', isCorrect: true },
+            { text: 'Ag.', isCorrect: false },
+            { text: 'Ca.', isCorrect: false }
+          ],
+          hint: 'Y phải đứng trước Cu và không tác dụng với nước (Ca phản ứng với H2O tạo Ca(OH)2 kết tủa và khí H2).',
+          rationale: 'Zn đứng trước Cu và không tan trong nước: Zn + CuSO4 -> ZnSO4 + Cu bám trên thanh kẽm.'
+        },
+
+        // BÀI 20: TÁCH KIM LOẠI - HỢP KIM - NHẬN BIẾT & VẬN DỤNG
+        {
+          id: 'chem-mcq-13',
+          type: 'mcq',
+          section: 'BÀI 20: TÁCH KIM LOẠI - VIỆC SỬ DỤNG HỢP KIM',
+          question: 'Câu 1 (Nhận biết): Kim loại được dùng làm vật liệu chế tạo vỏ máy bay do có tính bền và nhẹ, đó là kim loại nào?',
+          options: [
+            { text: 'Na.', isCorrect: false },
+            { text: 'Ca.', isCorrect: false },
+            { text: 'Al (Nhôm).', isCorrect: true },
+            { text: 'K.', isCorrect: false }
+          ],
+          hint: 'Kim loại này có khối lượng riêng nhỏ (2,7 g/cm³), có màng oxide bảo vệ chống ăn mòn.',
+          rationale: 'Nhôm (Al) và hợp kim của nhôm (duralumin) nhẹ, bền, chịu lực tốt nên được ứng dụng chế tạo vỏ máy bay, tàu hỏa.'
+        },
+        {
+          id: 'chem-mcq-14',
+          type: 'mcq',
+          section: 'BÀI 20: TÁCH KIM LOẠI - VIỆC SỬ DỤNG HỢP KIM',
+          question: 'Câu 2 (Nhận biết): Hợp kim là gì?',
+          options: [
+            { text: 'Vật liệu kim loại có chứa một kim loại cơ bản và một số kim loại hoặc phi kim khác.', isCorrect: true },
+            { text: 'Vật liệu kim loại có chứa một kim loại cơ bản và phi kim khác.', isCorrect: false },
+            { text: 'Vật liệu kim loại có chứa một kim loại cơ bản và kim loại khác.', isCorrect: false },
+            { text: 'Vật liệu phi kim có chứa một phi kim cơ bản và một số kim loại hoặc phi kim khác.', isCorrect: false }
+          ],
+          hint: 'Khái niệm trong SGK: hợp chất chứa một kim loại chủ đạo phối trộn với các nguyên tố kim loại hoặc phi kim khác.',
+          rationale: 'Hợp kim là vật liệu kim loại có chứa một kim loại cơ bản và một số kim loại hoặc phi kim khác nhằm cải thiện cơ tính.'
+        },
+        {
+          id: 'chem-mcq-15',
+          type: 'mcq',
+          section: 'BÀI 20: TÁCH KIM LOẠI - VIỆC SỬ DỤNG HỢP KIM',
+          question: 'Câu 3 (Nhận biết): Trong gang có chứa bao nhiêu phần trăm (%) khối lượng là carbon?',
+          options: [
+            { text: 'Dưới 2%.', isCorrect: false },
+            { text: 'Từ 2% - 5%.', isCorrect: true },
+            { text: 'Trên 5%.', isCorrect: false },
+            { text: 'Trên 10%.', isCorrect: false }
+          ],
+          hint: 'Gang có hàm lượng carbon cao hơn thép (thép chứa dưới 2%).',
+          rationale: 'Gang là hợp kim của sắt với carbon, trong đó hàm lượng carbon chiếm từ 2% đến 5%.'
+        },
+        {
+          id: 'chem-mcq-16',
+          type: 'mcq',
+          section: 'BÀI 20: TÁCH KIM LOẠI - VIỆC SỬ DỤNG HỢP KIM',
+          question: 'Câu 4 (Nhận biết): Hợp kim của sắt với một số nguyên tố khác như Cr, Ni... sáng bóng, không bị gỉ được gọi là gì?',
+          options: [
+            { text: 'Thép thường (thép carbon).', isCorrect: false },
+            { text: 'Gang.', isCorrect: false },
+            { text: 'Inox (thép không gỉ).', isCorrect: true },
+            { text: 'Duralumin.', isCorrect: false }
+          ],
+          hint: 'Vật liệu quen thuộc làm thìa, dĩa, nồi nấu, chậu rửa gia đình.',
+          rationale: 'Inox (thép không gỉ) là hợp kim của sắt chứa crom (Cr), niken (Ni)... có khả năng chống ăn mòn và gỉ sét rất cao.'
+        },
+        {
+          id: 'chem-mcq-17',
+          type: 'mcq',
+          section: 'BÀI 20: TÁCH KIM LOẠI - VIỆC SỬ DỤNG HỢP KIM',
+          question: 'Câu 5 (Nhận biết): Trong thép thường có chứa bao nhiêu % là carbon?',
+          options: [
+            { text: 'Dưới 2%.', isCorrect: true },
+            { text: 'Từ 2% - 5%.', isCorrect: false },
+            { text: 'Trên 5%.', isCorrect: false },
+            { text: 'Trên 10%.', isCorrect: false }
+          ],
+          hint: 'Hàm lượng carbon thấp giúp thép dẻo và đàn hồi hơn gang.',
+          rationale: 'Thép là hợp kim của sắt với carbon và một số nguyên tố khác, trong đó hàm lượng carbon dưới 2%.'
+        },
+        {
+          id: 'chem-mcq-18',
+          type: 'mcq',
+          section: 'BÀI 20: TÁCH KIM LOẠI - VIỆC SỬ DỤNG HỢP KIM',
+          question: 'Câu 6 (Nhận biết): Hợp kim của nhôm và đồng còn có một số nguyên tố khác như Mn, Mg... được gọi là gì?',
+          options: [
+            { text: 'Thép thường.', isCorrect: false },
+            { text: 'Gang.', isCorrect: false },
+            { text: 'Inox.', isCorrect: false },
+            { text: 'Duralumin.', isCorrect: true }
+          ],
+          hint: 'Vật liệu siêu bền nhẹ ứng dụng trong công nghiệp hàng không.',
+          rationale: 'Duralumin (đuy-ra) là hợp kim nhôm chứa khoảng 4% Cu và một lượng nhỏ Mg, Mn... rất bền và nhẹ.'
+        },
+        {
+          id: 'chem-mcq-19',
+          type: 'mcq',
+          section: 'BÀI 20: TÁCH KIM LOẠI - VIỆC SỬ DỤNG HỢP KIM',
+          question: 'Câu 1 (Vận dụng): Kim loại Na hoạt động rất mạnh được điều chế bằng phương pháp nào sau đây?',
+          options: [
+            { text: 'Phương pháp điện phân nóng chảy.', isCorrect: true },
+            { text: 'Phương pháp nhiệt luyện với chất phản ứng là CO.', isCorrect: false },
+            { text: 'Phương pháp nhiệt luyện với chất phản ứng là H2.', isCorrect: false },
+            { text: 'Phương pháp thủy luyện.', isCorrect: false }
+          ],
+          hint: 'Các kim loại từ đầu dãy đến Al chỉ có thể điều chế bằng cách điện phân nóng chảy muối hoặc oxide.',
+          rationale: 'Na là kim loại có tính khử rất mạnh, chỉ có thể tách bằng phương pháp điện phân nóng chảy muối (như NaCl nóng chảy).'
+        },
+        {
+          id: 'chem-mcq-20',
+          type: 'mcq',
+          section: 'BÀI 20: TÁCH KIM LOẠI - VIỆC SỬ DỤNG HỢP KIM',
+          question: 'Câu 2 (Vận dụng): Phương pháp nhiệt luyện với chất khử CO có thể tách được kim loại nào sau đây ra khỏi oxide của nó?',
+          options: [
+            { text: 'Fe.', isCorrect: true },
+            { text: 'K.', isCorrect: false },
+            { text: 'Ca.', isCorrect: false },
+            { text: 'Al.', isCorrect: false }
+          ],
+          hint: 'CO chỉ khử được các oxide kim loại đứng sau Al trong dãy hoạt động hóa học.',
+          rationale: 'CO có thể khử được oxit của các kim loại đứng sau nhôm: Fe2O3 + 3CO -(t°)-> 2Fe + 3CO2. K, Ca, Al oxide không bị CO khử.'
+        },
+        {
+          id: 'chem-mcq-21',
+          type: 'mcq',
+          section: 'BÀI 20: TÁCH KIM LOẠI - VIỆC SỬ DỤNG HỢP KIM',
+          question: 'Câu 3 (Vận dụng): Chất / các chất phản ứng dùng để tách kẽm ra khỏi quặng zinc sulfide (ZnS) là gì?',
+          options: [
+            { text: 'CO.', isCorrect: false },
+            { text: 'O2 và C.', isCorrect: true },
+            { text: 'HCl và Al.', isCorrect: false },
+            { text: 'H2.', isCorrect: false }
+          ],
+          hint: 'Đốt ZnS trong không khí O2 tạo ZnO, sau đó khử ZnO bằng than (C) ở nhiệt độ cao.',
+          rationale: 'Quy trình: 2ZnS + 3O2 -> 2ZnO + 2SO2; sau đó ZnO + C -> Zn + CO.'
+        },
+
+        // BÀI 20: TRẢ LỜI NGẮN
+        {
+          id: 'chem-sa-1',
+          type: 'short',
+          section: 'BÀI 20: TÁCH KIM LOẠI (TRẢ LỜI NGẮN)',
+          question: 'Câu 1: Quá trình sản xuất gang trong lò cao KHÔNG trải qua giai đoạn nào dưới đây? (Nhập con số đứng trước quá trình đó):\n(1) Quá trình tạo thành carbon monoxide.\n(2) Tạo gang từ quặng sắt.\n(3) Tạo xỉ, tách xỉ thu được gang.\n(4) Quá trình điện phân nóng chảy.',
+          expected: ['4'],
+          hint: 'Sản xuất gang dùng phương pháp nhiệt luyện trong lò cao, không dùng điện phân.',
+          explanation: 'Đáp án là 4: Quá trình điện phân nóng chảy không thuộc dây chuyền sản xuất gang trong lò cao.'
+        },
+        {
+          id: 'chem-sa-2',
+          type: 'short',
+          section: 'BÀI 20: TÁCH KIM LOẠI (TRẢ LỜI NGẮN)',
+          question: 'Câu 2: Người ta có thể dễ dàng lấy được xỉ trong quá trình sản xuất gang nhờ lý do nào? (Nhập số đứng trước nhận định đúng):\n(1) Xỉ nóng chảy nặng hơn gang nên lắng xuống dưới đáy lò.\n(2) Xỉ nóng chảy rồi bay hơi thoát ra ở phía trên miệng lò.\n(3) Xỉ nóng chảy nhẹ hơn gang nên nổi trên bề mặt, đưa ra ngoài ở cửa tháo xỉ.\n(4) Xỉ nóng chảy tạo huyền phù trong thép, loại bỏ bằng cách lọc.',
+          expected: ['3'],
+          hint: 'Khối lượng riêng của xỉ canxi silicat nhỏ hơn kim loại gang lỏng.',
+          explanation: 'Đáp án là 3: Xỉ (chủ yếu là CaSiO3) nhẹ hơn gang lỏng nên nổi lên trên bề mặt và được tháo ra ngoài ở cửa tháo xỉ riêng.'
+        },
+        {
+          id: 'chem-sa-3',
+          type: 'short',
+          section: 'BÀI 20: TÁCH KIM LOẠI (TRẢ LỜI NGẮN)',
+          question: 'Câu 3: Quá trình sản xuất gang gồm những giai đoạn nào dưới đây? (Nhập các số thứ tự liền nhau, ví dụ: 132):\n(1) Quá trình tạo thành carbon monoxide (CO).\n(2) Tạo xỉ, tách xỉ thu được gang.\n(3) Tạo gang từ quặng sắt.\n(4) Làm giảm tạp chất C, Si, Mn... trong gang (đây là luyện thép).',
+          expected: ['132', '1, 3, 2', '1,3,2', '123'],
+          hint: 'Giai đoạn tạo CO (1), khử quặng tạo gang (3) và tạo xỉ tách gang (2). Giai đoạn 4 là luyện thép.',
+          explanation: 'Đáp án là 132 (hoặc 1, 3, 2): (1) Tạo CO; (3) Khử quặng sắt tạo gang; (2) Tạo xỉ để tách xỉ thu gang sạch.'
+        },
+
+        // BÀI 21: PHI KIM VÀ KIM LOẠI - TRẮC NGHIỆM
+        {
+          id: 'chem-mcq-22',
+          type: 'mcq',
+          section: 'BÀI 21: PHI KIM VÀ KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 1: Ứng dụng nào sau đây KHÔNG PHẢI là ứng dụng của lưu huỳnh (Sulfur)?',
+          options: [
+            { text: 'Làm nguyên liệu sản xuất sulfuric acid.', isCorrect: false },
+            { text: 'Làm chất lưu hóa cao su.', isCorrect: false },
+            { text: 'Khử chua cho đất trồng trọt.', isCorrect: true },
+            { text: 'Điều chế thuốc súng đen.', isCorrect: false }
+          ],
+          hint: 'Khử chua đất trồng thường dùng vôi sống (CaO) hoặc vôi tôi.',
+          rationale: 'Để khử chua đất người ta dùng vôi (CaO, Ca(OH)2), lưu huỳnh không được dùng để khử chua đất (thậm chí lưu huỳnh làm chua đất thêm).'
+        },
+        {
+          id: 'chem-mcq-23',
+          type: 'mcq',
+          section: 'BÀI 21: PHI KIM VÀ KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 2: Tại sao than hoạt tính được sử dụng làm lõi lọc nước hoặc lõi lọc trong mặt nạ phòng độc?',
+          options: [
+            { text: 'Than hoạt tính có khả năng hấp thụ.', isCorrect: false },
+            { text: 'Than hoạt tính có khả năng hấp phụ (giữ chất khí, mùi trên bề mặt xốp).', isCorrect: true },
+            { text: 'Than hoạt tính có thể tác dụng hóa học với các chất độc.', isCorrect: false },
+            { text: 'Than hoạt tính có thể loại bỏ kim loại nặng bằng phản ứng oxy hóa.', isCorrect: false }
+          ],
+          hint: 'Hiện tượng giữ các phân tử chất khí/màu trên bề mặt diện tích tiếp xúc khổng lồ của than xốp.',
+          rationale: 'Than hoạt tính có cấu trúc xốp với diện tích bề mặt rất lớn, có tính hấp phụ cao giúp giữ lại các chất độc, mùi hôi và màu trên bề mặt.'
+        },
+        {
+          id: 'chem-mcq-24',
+          type: 'mcq',
+          section: 'BÀI 21: PHI KIM VÀ KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 3: Vật liệu nào dưới đây được dùng để chế tạo ruột bút chì đen?',
+          options: [
+            { text: 'Kim loại chì (Pb).', isCorrect: false },
+            { text: 'Than đá.', isCorrect: false },
+            { text: 'Than chì (Graphite).', isCorrect: true },
+            { text: 'Than vô định hình.', isCorrect: false }
+          ],
+          hint: 'Một dạng thù hình mềm, dẫn điện của nguyên tố Carbon.',
+          rationale: 'Ruột bút chì được làm từ than chì (graphite) trộn với đất sét mịn, mềm và để lại vệt đen trên giấy.'
+        },
+        {
+          id: 'chem-mcq-25',
+          type: 'mcq',
+          section: 'BÀI 21: PHI KIM VÀ KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 4: Lưu huỳnh (Sulfur) được sử dụng trong lĩnh vực nào sau đây?',
+          options: [
+            { text: 'Mặt nạ phòng độc.', isCorrect: false },
+            { text: 'Ruột bút chì.', isCorrect: false },
+            { text: 'Pin mặt trời.', isCorrect: false },
+            { text: 'Sản xuất pháo hoa và thuốc súng.', isCorrect: true }
+          ],
+          hint: 'Là một thành phần cốt lõi của thuốc nổ đen cùng với than và KNO3.',
+          rationale: 'Lưu huỳnh dễ bắt cháy và tỏa nhiều nhiệt, là thành phần quan trọng sản xuất thuốc súng đen, pháo hoa và diêm quẹt.'
+        },
+        {
+          id: 'chem-mcq-26',
+          type: 'mcq',
+          section: 'BÀI 21: PHI KIM VÀ KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 5: Trong các chất sau, phi kim nào được ứng dụng để sản xuất nước Javel, chất tẩy rửa và khử trùng nước sinh hoạt?',
+          options: [
+            { text: 'Carbon.', isCorrect: false },
+            { text: 'Lưu huỳnh.', isCorrect: false },
+            { text: 'Silicon.', isCorrect: false },
+            { text: 'Chlorine.', isCorrect: true }
+          ],
+          hint: 'Khí này tác dụng với dung dịch NaOH tạo hỗn hợp NaCl và NaClO (nước Javel).',
+          rationale: 'Chlorine (Cl2) phản ứng với kiềm tạo nước Javel có tính oxy hóa mạnh dùng khử trùng và tẩy trắng.'
+        },
+        {
+          id: 'chem-mcq-27',
+          type: 'mcq',
+          section: 'BÀI 21: PHI KIM VÀ KIM LOẠI (TRẮC NGHIỆM)',
+          question: 'Câu 6: Tủ lạnh dùng lâu ngày thường có mùi hôi. Để khử mùi người ta thường cho vào tủ lạnh một mẩu than gỗ. Than gỗ có khả năng khử mùi hôi là vì:',
+          options: [
+            { text: 'Than gỗ có tính khử mạnh.', isCorrect: false },
+            { text: 'Than gỗ xúc tác cho quá trình chuyển hóa các chất khí có mùi hôi thành chất không mùi.', isCorrect: false },
+            { text: 'Than gỗ có khả năng phản ứng với các khí có mùi tạo thành chất không mùi.', isCorrect: false },
+            { text: 'Than gỗ có khả năng hấp phụ các khí có mùi hôi.', isCorrect: true }
+          ],
+          hint: 'Cấu trúc nhiều lỗ rỗng của than giữ lại các phân tử khí mùi hôi.',
+          rationale: 'Than gỗ có cấu trúc rỗng xốp, có tính hấp phụ các phân tử khí có mùi hôi trong không gian kín của tủ lạnh.'
+        }
+      ],
+
+      // ==========================================
+      // SINH HỌC 9
+      // ==========================================
+      biology: [
+        // BÀI 36: KHÁI QUÁT VỀ DI TRUYỀN HỌC - TRẮC NGHIỆM
+        {
+          id: 'bio-mcq-1',
+          type: 'mcq',
+          section: 'BÀI 36: KHÁI QUÁT VỀ DI TRUYỀN HỌC (TRẮC NGHIỆM)',
+          question: 'Câu 1: Hiện tượng con sinh ra khác nhau và khác với bố mẹ về các chi tiết được gọi là gì?',
+          options: [
+            { text: 'Biến dị.', isCorrect: true },
+            { text: 'Nguyên phân.', isCorrect: false },
+            { text: 'Thụ tinh.', isCorrect: false },
+            { text: 'Di truyền.', isCorrect: false }
+          ],
+          hint: 'Sự xuất hiện các nét mới, sai khác so với thế hệ sinh thành.',
+          rationale: 'Biến dị là hiện tượng con sinh ra khác nhau và khác với bố mẹ về nhiều đặc điểm tính trạng.'
+        },
+        {
+          id: 'bio-mcq-2',
+          type: 'mcq',
+          section: 'BÀI 36: KHÁI QUÁT VỀ DI TRUYỀN HỌC (TRẮC NGHIỆM)',
+          question: 'Câu 2: Sự truyền đạt các đặc điểm tính trạng từ thế hệ này sang thế hệ khác được gọi là gì?',
+          options: [
+            { text: 'Thụ tinh.', isCorrect: false },
+            { text: 'Biến dị.', isCorrect: false },
+            { text: 'Giảm phân.', isCorrect: false },
+            { text: 'Di truyền.', isCorrect: true }
+          ],
+          hint: 'Kế thừa các nét giống với tổ tiên, cha mẹ.',
+          rationale: 'Di truyền là hiện tượng truyền đạt các tính trạng của bố mẹ, tổ tiên cho các thế hệ con cháu.'
+        },
+        {
+          id: 'bio-mcq-3',
+          type: 'mcq',
+          section: 'BÀI 36: KHÁI QUÁT VỀ DI TRUYỀN HỌC (TRẮC NGHIỆM)',
+          question: 'Câu 3: Đâu là ví dụ điển hình về hiện tượng di truyền ở người?',
+          options: [
+            { text: 'Bố và mẹ thuận tay phải, sinh ra con thuận tay trái.', isCorrect: false },
+            { text: 'Bố và mẹ có tóc đen, sinh ra con có tóc vàng.', isCorrect: false },
+            { text: 'Bố và mẹ có màu mắt nâu, sinh ra con có màu mắt đen.', isCorrect: false },
+            { text: 'Bố và mẹ có tóc xoăn, sinh ra con có tóc xoăn.', isCorrect: true }
+          ],
+          hint: 'Đặc điểm tính trạng của con giống hoàn toàn với bố mẹ.',
+          rationale: 'Bố mẹ tóc xoăn sinh con tóc xoăn thể hiện sự truyền đạt nguyên vẹn tính trạng từ thế hệ trước sang thế hệ sau.'
+        },
+
+        // BÀI 36: ĐÚNG / SAI
+        {
+          id: 'bio-tf-1',
+          type: 'tf',
+          section: 'BÀI 36: KHÁI QUÁT VỀ DI TRUYỀN HỌC (ĐÚNG - SAI)',
+          prompt: 'Câu 1: Khi nói về các khái niệm cơ bản trong chương trình KHTN 9, phát biểu nào sau đây là ĐÚNG, phát biểu nào là SAI?',
+          statements: [
+            { id: 's1', text: 'a. Di truyền là hiện tượng truyền đạt các tính trạng của bố mẹ, tổ tiên cho các thế hệ con cháu, giúp các thế hệ sau có nhiều đặc điểm giống thế hệ trước.', isCorrect: true, rationale: 'Đúng: Định nghĩa chuẩn về hiện tượng di truyền.' },
+            { id: 's2', text: 'b. Biến dị là hiện tượng con sinh ra có các đặc điểm khác nhau và khác với bố mẹ, góp phần làm phong phú sự đa dạng của sinh giới.', isCorrect: true, rationale: 'Đúng: Biến dị tạo ra sự sai khác phong phú giữa các cá thể.' },
+            { id: 's3', text: 'c. Tính trạng lặn là tính trạng chỉ được biểu hiện ra kiểu hình khi cơ thể mang kiểu gene dị hợp tử.', isCorrect: false, rationale: 'Sai: Tính trạng lặn chỉ biểu hiện ra kiểu hình khi ở trạng thái đồng hợp lặn (ví dụ: aa).' },
+            { id: 's4', text: 'd. Nhân tố di truyền (nay được gọi là gene hoặc allele) tồn tại thành từng cặp trong nhân tế bào và không bị hòa trộn vào nhau trong quá trình truyền đạt qua các thế hệ.', isCorrect: true, rationale: 'Đúng: Theo quy luật Men-đen, các nhân tố di truyền phân li độc lập và giữ nguyên bản chất.' }
+          ]
+        },
+        {
+          id: 'bio-tf-2',
+          type: 'tf',
+          section: 'BÀI 36: KHÁI QUÁT VỀ DI TRUYỀN HỌC (ĐÚNG - SAI)',
+          prompt: 'Câu 2: Nhận định nào sau đây là Đúng hay Sai về khái niệm di truyền và biến dị?',
+          statements: [
+            { id: 's1', text: 'a. Di truyền là hiện tượng truyền đạt các đặc điểm (tính trạng) của bố mẹ, tổ tiên cho các thế hệ con cháu.', isCorrect: true, rationale: 'Đúng: Khái niệm di truyền học cơ bản.' },
+            { id: 's2', text: 'b. Biến dị là hiện tượng con cái sinh ra hoàn toàn giống nhau và không có điểm khác biệt so với bố mẹ.', isCorrect: false, rationale: 'Sai: Biến dị là hiện tượng tạo ra các điểm KHÁC NHAU giữa con cái và bố mẹ.' },
+            { id: 's3', text: 'c. Nhờ có hiện tượng di truyền, các đặc điểm đặc trưng của loài được duy trì ổn định qua các thế hệ.', isCorrect: true, rationale: 'Đúng: Giúp bảo tồn loài qua các thế hệ sinh sản.' },
+            { id: 's4', text: 'd. Biến dị làm mất hoàn toàn khả năng duy trì đặc điểm của loài ở các thế hệ tiếp theo.', isCorrect: false, rationale: 'Sai: Biến dị và di truyền là hai mặt song song của sinh sản, biến dị không làm mất tính duy trì loài mà chỉ tạo đa dạng thích nghi.' }
+          ]
+        },
+        {
+          id: 'bio-tf-3',
+          type: 'tf',
+          section: 'BÀI 36: KHÁI QUÁT VỀ DI TRUYỀN HỌC (ĐÚNG - SAI)',
+          prompt: 'Câu 3: Đánh giá tính đúng - sai của các nhận định dưới đây về Di truyền và Biến dị:',
+          statements: [
+            { id: 's1', text: 'a. Di truyền học là môn khoa học nghiên cứu về bản chất, cơ chế và quy luật của tính di truyền và biến dị.', isCorrect: true, rationale: 'Đúng: Định nghĩa đối tượng nghiên cứu của Di truyền học.' },
+            { id: 's2', text: 'b. Biến dị là hiện tượng con cái sinh ra hoàn toàn giống nhau và giống hệt bố mẹ.', isCorrect: false, rationale: 'Sai: Giống hệt bố mẹ là biểu hiện của di truyền, không phải biến dị.' },
+            { id: 's3', text: 'c. Hiện tượng di truyền và biến dị do các nhân tố di truyền nằm trong tế bào quy định.', isCorrect: true, rationale: 'Đúng: Được quy định bởi vật chất di truyền (gene/DNA) trên nhiễm sắc thể.' },
+            { id: 's4', text: 'd. Biến dị làm mất hoàn toàn khả năng duy trì đặc điểm của loài ở các thế hệ tiếp theo.', isCorrect: false, rationale: 'Sai: Nhận định không chính xác về vai trò sinh học của biến dị.' }
+          ]
+        },
+
+        // BÀI 37: CÁC QUY LUẬT DI TRUYỀN CỦA MENDEL - TRẮC NGHIỆM
+        {
+          id: 'bio-mcq-4',
+          type: 'mcq',
+          section: 'BÀI 37: QUY LUẬT DI TRUYỀN CỦA MENDEL (TRẮC NGHIỆM)',
+          question: 'Câu 1: Theo Mendel, tính trạng được biểu hiện ngay ở cơ thể lai F1 khi lai hai cơ thể thuần chủng tương phản được gọi là:',
+          options: [
+            { text: 'Tính trạng lặn.', isCorrect: false },
+            { text: 'Tính trạng tương ứng.', isCorrect: false },
+            { text: 'Tính trạng trung gian.', isCorrect: false },
+            { text: 'Tính trạng trội.', isCorrect: true }
+          ],
+          hint: 'Tính trạng lấn át hoàn toàn tính trạng còn lại ở F1.',
+          rationale: 'Tính trạng biểu hiện ở F1 là tính trạng trội; tính trạng đến F2 mới biểu hiện là tính trạng lặn.'
+        },
+        {
+          id: 'bio-mcq-5',
+          type: 'mcq',
+          section: 'BÀI 37: QUY LUẬT DI TRUYỀN CỦA MENDEL (TRẮC NGHIỆM)',
+          question: 'Câu 2: Cặp tính trạng tương phản là gì?',
+          options: [
+            { text: 'Các tính trạng cùng một loại nhưng biểu hiện trái ngược nhau.', isCorrect: true },
+            { text: 'Những tính trạng số lượng và chất lượng của cơ thể.', isCorrect: false },
+            { text: 'Tính trạng do một cặp alen cùng chiều quy định.', isCorrect: false },
+            { text: 'Các tính trạng ở hai loài sinh vật hoàn toàn khác biệt nhau.', isCorrect: false }
+          ],
+          hint: 'Ví dụ: hạt trơn đối lập với hạt nhăn, thân cao đối lập với thân thấp.',
+          rationale: 'Cặp tính trạng tương phản là hai trạng thái biểu hiện trái ngược nhau của cùng một loại tính trạng (ví dụ: hoa tím - hoa trắng).'
+        },
+        {
+          id: 'bio-mcq-6',
+          type: 'mcq',
+          section: 'BÀI 37: QUY LUẬT DI TRUYỀN CỦA MENDEL (TRẮC NGHIỆM)',
+          question: 'Câu 3: Ý nghĩa thực tiễn quan trọng của phép lai phân tích là gì?',
+          options: [
+            { text: 'Tìm kiếm kiểu hình trội trong quần thể.', isCorrect: false },
+            { text: 'Xác định kiểu gene của cơ thể mang tính trạng trội (đồng hợp tử hay dị hợp tử).', isCorrect: true },
+            { text: 'Tạo ra nhiều biến dị tổ hợp phong phú.', isCorrect: false },
+            { text: 'Làm gia tăng tỉ lệ đột biến gene có lợi.', isCorrect: false }
+          ],
+          hint: 'Đem cơ thể mang kiểu hình trội lai với cơ thể đồng hợp lặn.',
+          rationale: 'Lai phân tích dùng để kiểm tra kiểu gene của cơ thể mang tính trạng trội là thuần chủng (AA) hay không thuần chủng (Aa).'
+        },
+
+        // BÀI 37: PHẦN TỰ LUẬN SƠ ĐỒ LAI
+        {
+          id: 'bio-es-1',
+          type: 'essay',
+          section: 'BÀI 37: QUY LUẬT DI TRUYỀN MENDEL (TỰ LUẬN)',
+          question: 'Câu 1: Lai hai dòng đậu Hà Lan thuần chủng hạt trơn với hạt nhăn thu được F1 toàn là hạt trơn. Cho F1 tự thụ phấn thu được F2.\nEm hãy biện luận và viết sơ đồ lai từ P đến F2?',
+          hint: 'F1 toàn hạt trơn -> Hạt trơn là trội hoàn toàn (A), hạt nhăn là lặn (a). P thuần chủng: AA x aa.',
+          modelAnswer: `Biện luận và Lập sơ đồ lai:\n1. Biện luận:\n- Do P thuần chủng, F1 đồng loạt thu được 100% hạt trơn → Tính trạng hạt trơn là trội hoàn toàn so với hạt nhăn.\n- Quy ước gene:\n   + Gene A quy định tính trạng hạt trơn.\n   + Gene a quy định tính trạng hạt nhăn.\n- P thuần chủng có kiểu gene: Hạt trơn (AA) × Hạt nhăn (aa).\n\n2. Sơ đồ lai từ P đến F2:\nP (t/c): Hạt trơn AA  ×  Hạt nhăn aa\nGP:             A               a\nF1: 100% Aa (Kiểu hình: 100% hạt trơn)\n\nCho F1 tự thụ phấn (F1 × F1):\nF1 × F1: Hạt trơn Aa  ×  Hạt trơn Aa\nGF1:       1/2 A : 1/2 a     1/2 A : 1/2 a\nF2:\n- Tỉ lệ kiểu gene: 1 AA : 2 Aa : 1 aa (25% AA : 50% Aa : 25% aa)\n- Tỉ lệ kiểu hình: 3 hạt trơn : 1 hạt nhăn (75% trơn : 25% nhăn).`
+        },
+        {
+          id: 'bio-es-2',
+          type: 'essay',
+          section: 'BÀI 37: QUY LUẬT DI TRUYỀN MENDEL (TỰ LUẬN)',
+          question: 'Câu 2: Ở đậu Hà Lan, gene quy định chiều cao thân nằm trên NST thường. Gene A quy định thân cao, gene a quy định thân thấp. Xác định kiểu gene, kiểu hình của mỗi cặp bố mẹ và lập sơ đồ cho phép lai khi F1 thu được 100% cá thể thân cao?',
+          hint: 'F1 đồng tính thân cao (100%) khi lai giữa hai cơ thể thuần chủng mang tính trạng tương phản: AA x aa.',
+          modelAnswer: `Biện luận và Lập sơ đồ lai:\n1. Biện luận:\n- Theo đề bài, gene A quy định thân cao là trội hoàn toàn so với gene a quy định thân thấp.\n- Để thế hệ lai F1 đồng tính 100% thân cao thì P phải thuần chủng:\n   + Cây thân cao thuần chủng có kiểu gene là AA.\n   + Cây thân thấp có kiểu gene là aa.\n\n2. Sơ đồ lai:\nP: Thân cao (AA)  ×  Thân thấp (aa)\nGP:       A                   a\nF1:\n- Kiểu gene: 100% Aa\n- Kiểu hình: 100% cây đậu Hà Lan thân cao.`
+        },
+        {
+          id: 'bio-es-3',
+          type: 'essay',
+          section: 'BÀI 37: QUY LUẬT DI TRUYỀN MENDEL (TỰ LUẬN)',
+          question: 'Câu 3: Ở đậu Hà Lan, gene quy định màu sắc của hoa nằm trên NST thường. Gene A quy định hoa tím, gene a quy định hoa trắng. Xác định kiểu gene, kiểu hình của bố mẹ (P) và lập sơ đồ lai khi đời F1 phân li theo tỉ lệ 50% hoa tím : 50% hoa trắng?',
+          hint: 'Tỉ lệ phân li 1:1 ở đời con là kết quả của phép lai phân tích: cơ thể dị hợp Aa lai với đồng hợp lặn aa.',
+          modelAnswer: `Biện luận và Lập sơ đồ lai:\n1. Biện luận:\n- F1 phân li theo tỉ lệ 50% hoa tím : 50% hoa trắng = 1 : 1 (tổng có 2 tổ hợp giao tử = 2 × 1).\n- Cây hoa trắng có kiểu hình lặn, kiểu gene là aa (nhận 1 giao tử a từ bố và 1 giao tử a từ mẹ).\n- Cây hoa tím ở P phải cho giao tử mang allele a → Cây hoa tím P có kiểu gene dị hợp là Aa.\n- Đây là kết quả của phép lai phân tích giữa cá thể dị hợp với cá thể đồng hợp lặn.\n\n2. Sơ đồ lai:\nP: Hoa tím (Aa)  ×  Hoa trắng (aa)\nGP:   1/2 A : 1/2 a           a\nF1:\n- Tỉ lệ kiểu gene: 1 Aa : 1 aa (50% Aa : 50% aa)\n- Tỉ lệ kiểu hình: 1 Hoa tím : 1 Hoa trắng (50% tím : 50% trắng).`
+        }
+      ]
+    };
+
+    // State
+    let currentSubject = 'physics';
+    let currentFilter = 'all';
+    let userAnswers = {};
+    let earnedPoints = 0;
+    let tfState = {};
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAllSubjects();
+      updateCounters();
+    });
+
+    function switchTab(subject) {
+      currentSubject = subject;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white/15', 'text-white', 'border-white');
+        btn.classList.add('text-blue-100', 'border-transparent');
+      });
+      const activeBtn = document.getElementById(`tab-btn-${subject}`);
+      activeBtn.classList.add('bg-white/15', 'text-white', 'border-white');
+      activeBtn.classList.remove('text-blue-100', 'border-transparent');
+
+      document.querySelectorAll('.subject-section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById(`subject-${subject}`).classList.remove('hidden');
+
+      filterType(currentFilter);
+    }
+
+    function filterType(type) {
+      currentFilter = type;
+      document.querySelectorAll('.filter-pill').forEach(pill => {
+        if (pill.getAttribute('data-filter') === type) {
+          pill.className = 'filter-pill bg-indigo-600 text-white px-2.5 py-1 rounded-full font-medium';
+        } else {
+          pill.className = 'filter-pill bg-slate-100 text-slate-600 hover:bg-slate-200 px-2.5 py-1 rounded-full font-medium';
+        }
+      });
+
+      const cards = document.querySelectorAll(`#subject-${currentSubject} .question-card`);
+      cards.forEach(card => {
+        const cType = card.getAttribute('data-type');
+        if (type === 'all' || cType === type) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function renderAllSubjects() {
+      ['physics', 'chemistry', 'biology'].forEach(sub => {
+        const container = document.getElementById(`subject-${sub}`);
+        container.innerHTML = '';
+        const list = questionBank[sub];
+
+        let currentSectionHeader = '';
+        list.forEach((item, index) => {
+          if (item.section && item.section !== currentSectionHeader) {
+            currentSectionHeader = item.section;
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'pt-4 pb-2 border-b-2 border-indigo-500/30 flex items-center gap-2 text-indigo-900 font-bold text-base sm:text-lg';
+            headerDiv.innerHTML = `<span class="w-2.5 h-6 bg-indigo-600 rounded-full inline-block"></span> ${currentSectionHeader}`;
+            container.appendChild(headerDiv);
+          }
+
+          const card = createQuestionCard(item, index + 1, sub);
+          container.appendChild(card);
+        });
+      });
+    }
+
+    function createQuestionCard(item, displayIndex, subject) {
+      const card = document.createElement('div');
+      card.className = 'question-card bg-white rounded-2xl p-5 border border-slate-200 shadow-sm transition hover:shadow-md';
+      card.id = `card-${item.id}`;
+      card.setAttribute('data-type', item.type);
+
+      let innerHtml = `
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-lg">Câu ${displayIndex}</span>
+            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">${getTypeLabel(item.type)}</span>
+          </div>
+          <div class="status-badge text-xs font-semibold px-2 py-0.5 rounded-md hidden" id="status-${item.id}"></div>
+        </div>
+      `;
+
+      // Chemistry Reaction Illustration for Bài 18 Câu 1
+      if (item.hasExpVisual) {
+        innerHtml += `
+          <div class="my-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <p class="text-xs font-semibold text-slate-700 mb-2 text-center">Hình 15.1: Hiện tượng khi cho một số kim loại phản ứng với dung dịch acid HCl loãng</p>
+            <div class="grid grid-cols-5 gap-2 text-center text-[11px]">
+              <div class="flex flex-col items-center bg-white p-2 rounded-lg border border-slate-200">
+                <div class="w-10 h-24 border-2 border-slate-400 rounded-b-xl relative bg-blue-50/50 flex flex-col justify-end p-1">
+                  <div class="w-6 h-2 bg-amber-700 mx-auto rounded"></div>
+                </div>
+                <span class="font-bold text-slate-700 mt-2">Đồng (Cu)</span>
+                <span class="text-[10px] text-slate-400">Không sủi bọt</span>
+              </div>
+              <div class="flex flex-col items-center bg-white p-2 rounded-lg border border-amber-200 bg-amber-50/30">
+                <div class="w-10 h-24 border-2 border-slate-400 rounded-b-xl relative bg-blue-50/50 flex flex-col justify-between p-1">
+                  <div class="text-amber-500 animate-bounce text-sm">🔥</div>
+                  <div class="w-4 h-4 bg-slate-300 rounded-full mx-auto self-start mt-4"></div>
+                </div>
+                <span class="font-bold text-amber-800 mt-2">Natri (Na)</span>
+                <span class="text-[10px] text-rose-600 font-medium">Bốc cháy nổ</span>
+              </div>
+              <div class="flex flex-col items-center bg-white p-2 rounded-lg border border-slate-200">
+                <div class="w-10 h-24 border-2 border-slate-400 rounded-b-xl relative bg-blue-50/50 flex flex-col justify-end p-1">
+                  <div class="text-[9px] text-blue-500 mb-1">°</div>
+                  <div class="w-6 h-2 bg-slate-500 mx-auto rounded"></div>
+                </div>
+                <span class="font-bold text-slate-700 mt-2">Chì (Pb)</span>
+                <span class="text-[10px] text-slate-400">Rất ít bọt</span>
+              </div>
+              <div class="flex flex-col items-center bg-white p-2 rounded-lg border border-emerald-200 bg-emerald-50/30">
+                <div class="w-10 h-24 border-2 border-slate-400 rounded-b-xl relative bg-blue-50/50 flex flex-col justify-end p-1 overflow-hidden">
+                  <div class="text-[10px] text-blue-600 space-y-0.5 mb-1 leading-none font-bold">° ° °<br>° ° ° °<br>° °</div>
+                  <div class="w-6 h-2 bg-slate-300 mx-auto rounded"></div>
+                </div>
+                <span class="font-bold text-emerald-800 mt-2">Magnesium</span>
+                <span class="text-[10px] text-emerald-600 font-medium">Sủi bọt rất mạnh</span>
+              </div>
+              <div class="flex flex-col items-center bg-white p-2 rounded-lg border border-slate-200">
+                <div class="w-10 h-24 border-2 border-slate-400 rounded-b-xl relative bg-blue-50/50 flex flex-col justify-end p-1">
+                  <div class="text-[9px] text-blue-500 mb-1">° °<br>°</div>
+                  <div class="w-6 h-2 bg-slate-700 mx-auto rounded"></div>
+                </div>
+                <span class="font-bold text-slate-700 mt-2">Sắt (Fe)</span>
+                <span class="text-[10px] text-slate-500">Sủi bọt vừa</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (item.type === 'mcq') {
+        innerHtml += `
+          <p class="font-medium text-slate-800 text-sm sm:text-base leading-relaxed mb-4">${escapeHtml(item.question)}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
+            ${item.options.map((opt, oIdx) => `
+              <button onclick="handleSelectMCQ('${item.id}', ${oIdx}, '${subject}')" id="btn-${item.id}-${oIdx}" class="mcq-option text-left px-3.5 py-2.5 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 text-xs sm:text-sm font-normal transition duration-150 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center text-xs font-semibold text-slate-600 shrink-0 bg-slate-50">${String.fromCharCode(65 + oIdx)}</span>
+                <span class="opt-text">${escapeHtml(opt.text)}</span>
+              </button>
+            `).join('')}
+          </div>
+        `;
+      } else if (item.type === 'tf') {
+        innerHtml += `
+          <p class="font-medium text-slate-800 text-sm sm:text-base leading-relaxed mb-3">${escapeHtml(item.prompt)}</p>
+          <div class="space-y-3 mb-4">
+            ${item.statements.map((stmt, sIdx) => `
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
+                <div class="text-slate-700 font-normal leading-snug flex-1">${escapeHtml(stmt.text)}</div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button onclick="setTFChoice('${item.id}', '${stmt.id}', true)" id="tf-btn-${item.id}-${stmt.id}-true" class="tf-btn px-3 py-1 rounded-lg border border-slate-300 bg-white hover:bg-emerald-50 font-medium text-xs">Đúng</button>
+                  <button onclick="setTFChoice('${item.id}', '${stmt.id}', false)" id="tf-btn-${item.id}-${stmt.id}-false" class="tf-btn px-3 py-1 rounded-lg border border-slate-300 bg-white hover:bg-rose-50 font-medium text-xs">Sai</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="flex justify-end mb-2">
+            <button onclick="checkTFQuestion('${item.id}', '${subject}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-check-double mr-1.5"></i>Kiểm tra kết quả Đúng / Sai
+            </button>
+          </div>
+        `;
+      } else if (item.type === 'short') {
+        innerHtml += `
+          <p class="font-medium text-slate-800 text-sm sm:text-base whitespace-pre-line leading-relaxed mb-3">${escapeHtml(item.question)}</p>
+          <div class="flex flex-wrap items-center gap-2 mb-4">
+            <input type="text" id="input-${item.id}" placeholder="Nhập kết quả (con số)..." class="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-64" onkeydown="if(event.key==='Enter') checkShortAnswer('${item.id}', '${subject}')">
+            <button onclick="checkShortAnswer('${item.id}', '${subject}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-paper-plane mr-1.5"></i>Kiểm tra
+            </button>
+          </div>
+        `;
+      } else if (item.type === 'essay') {
+        innerHtml += `
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 mb-3">
+            <p class="font-medium text-slate-800 text-sm sm:text-base whitespace-pre-line leading-relaxed">${escapeHtml(item.question)}</p>
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5 flex items-center justify-between">
+              <span><i class="fa-solid fa-pen-nib text-indigo-600 mr-1.5"></i>Góc soạn thảo bài làm của học sinh:</span>
+              <span class="text-[11px] text-slate-400 font-normal">Học sinh tự gõ lời giải, công thức và sơ đồ lai</span>
+            </label>
+            <textarea id="essay-input-${item.id}" rows="5" class="w-full border border-slate-300 rounded-xl p-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono" placeholder="Gõ các bước tính toán, tóm tắt, phương trình hóa học hoặc sơ đồ lai tại đây..."></textarea>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <button onclick="toggleHint('${item.id}')" class="text-xs text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-regular fa-lightbulb"></i>Gợi ý giải bài
+            </button>
+            <button onclick="toggleEssayModel('${item.id}')" class="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white text-xs sm:text-sm font-medium px-4 py-1.5 rounded-xl transition shadow-sm flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check"></i>Đối chiếu đáp án mẫu & Hướng dẫn chấm
+            </button>
+          </div>
+          <div id="essay-model-${item.id}" class="hidden mt-3 p-4 bg-indigo-50/80 border border-indigo-300 rounded-xl text-xs sm:text-sm leading-relaxed">
+            <div class="font-bold text-indigo-900 mb-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-clipboard-check"></i> ĐÁP ÁN VÀ LỜI GIẢI CHI TIẾT:
+            </div>
+            <div class="whitespace-pre-line text-slate-800 bg-white p-3 rounded-lg border border-indigo-200 mb-3">${escapeHtml(item.modelAnswer)}</div>
+            <div class="flex items-center justify-between pt-2 border-t border-indigo-200 text-xs">
+              <span class="text-indigo-900 font-medium">Tự đánh giá kết quả làm bài của em:</span>
+              <div class="space-x-2">
+                <button onclick="markSelfEssay('${item.id}', true)" class="px-2.5 py-1 bg-emerald-600 text-white rounded-md font-semibold hover:bg-emerald-700">Đã hiểu & Đạt yêu cầu</button>
+                <button onclick="markSelfEssay('${item.id}', false)" class="px-2.5 py-1 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300">Cần ôn tập thêm</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Shared Hint Box
+      innerHtml += `
+        <div id="hint-${item.id}" class="hidden mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2">
+          <i class="fa-solid fa-lightbulb text-amber-600 mt-0.5"></i>
+          <div><strong class="font-semibold">Gợi ý tư duy:</strong> ${escapeHtml(item.hint || 'Áp dụng công thức và kiến thức bài học trong SGK để giải quyết.')}</div>
+        </div>
+        <div id="feedback-${item.id}" class="hidden mt-3 p-3 rounded-xl text-xs leading-relaxed"></div>
+      `;
+
+      if (item.type !== 'essay') {
+        innerHtml += `
+          <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-400 mt-3">
+            <button onclick="toggleHint('${item.id}')" class="text-slate-500 hover:text-amber-600 flex items-center gap-1 transition">
+              <i class="fa-regular fa-lightbulb text-amber-500"></i> Xem gợi ý
+            </button>
+            <span class="text-[11px] text-slate-400">KHTN 9 - Giữa Kỳ I</span>
+          </div>
+        `;
+      }
+
+      card.innerHTML = innerHtml;
+      return card;
+    }
+
+    function getTypeLabel(type) {
+      switch (type) {
+        case 'mcq': return 'Trắc nghiệm nhiều lựa chọn';
+        case 'tf': return 'Trắc nghiệm Đúng - Sai';
+        case 'short': return 'Trả lời ngắn';
+        case 'essay': return 'Tự luận';
+        default: return '';
+      }
+    }
+
+    // MCQ Handler
+    function handleSelectMCQ(qId, selectedIdx, subject) {
+      const q = questionBank[subject].find(item => item.id === qId);
+      if (!q) return;
+
+      const feedbackBox = document.getElementById(`feedback-${qId}`);
+      const statusBadge = document.getElementById(`status-${qId}`);
+      const isCorrect = q.options[selectedIdx].isCorrect;
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.getElementById(`btn-${qId}-${idx}`);
+        btn.disabled = true;
+        btn.classList.remove('hover:border-indigo-400', 'hover:bg-indigo-50/40');
+        if (opt.isCorrect) {
+          btn.className = 'mcq-option text-left px-3.5 py-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 text-xs sm:text-sm font-semibold flex items-center gap-2';
+        } else if (idx === selectedIdx) {
+          btn.className = 'mcq-option text-left px-3.5 py-2.5 rounded-xl border-2 border-rose-400 bg-rose-50 text-rose-900 text-xs sm:text-sm font-normal flex items-center gap-2';
+        }
+      });
+
+      statusBadge.classList.remove('hidden');
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        statusBadge.className = 'status-badge text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>Chính xác (+10đ)';
+        feedbackBox.className = 'mt-3 p-3 rounded-xl text-xs bg-emerald-50 border border-emerald-200 text-emerald-900';
+        feedbackBox.innerHTML = `<strong>Rất tốt!</strong> ${escapeHtml(q.rationale)}`;
+        if (!userAnswers[qId]) earnedPoints += 10;
+      } else {
+        statusBadge.className = 'status-badge text-xs font-semibold px-2 py-0.5 rounded-md bg-rose-100 text-rose-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i>Chưa chính xác';
+        feedbackBox.className = 'mt-3 p-3 rounded-xl text-xs bg-rose-50 border border-rose-200 text-rose-900';
+        feedbackBox.innerHTML = `<strong>Giải thích chi tiết:</strong> ${escapeHtml(q.rationale)}`;
+      }
+
+      userAnswers[qId] = { selected: selectedIdx, isCorrect: isCorrect };
+      updateScoreCounter();
+    }
+
+    // True/False Handler
+    function setTFChoice(qId, stmtId, value) {
+      if (!tfState[qId]) tfState[qId] = {};
+      tfState[qId][stmtId] = value;
+
+      const trueBtn = document.getElementById(`tf-btn-${qId}-${stmtId}-true`);
+      const falseBtn = document.getElementById(`tf-btn-${qId}-${stmtId}-false`);
+
+      if (value === true) {
+        trueBtn.className = 'tf-btn px-3 py-1 rounded-lg border border-emerald-600 bg-emerald-600 text-white font-bold text-xs shadow-sm';
+        falseBtn.className = 'tf-btn px-3 py-1 rounded-lg border border-slate-300 bg-white font-medium text-xs text-slate-700';
+      } else {
+        falseBtn.className = 'tf-btn px-3 py-1 rounded-lg border border-rose-600 bg-rose-600 text-white font-bold text-xs shadow-sm';
+        trueBtn.className = 'tf-btn px-3 py-1 rounded-lg border border-slate-300 bg-white font-medium text-xs text-slate-700';
+      }
+    }
+
+    function checkTFQuestion(qId, subject) {
+      const q = questionBank[subject].find(item => item.id === qId);
+      if (!q) return;
+
+      const currentAnswers = tfState[qId] || {};
+      const unanswered = q.statements.filter(s => currentAnswers[s.id] === undefined);
+
+      if (unanswered.length > 0) {
+        showToast('Em hãy chọn Đúng hoặc Sai cho tất cả các ý trong câu trước khi kiểm tra nhé!');
+        return;
+      }
+
+      let allCorrect = true;
+      let detailedFeedback = '<ul class="space-y-1.5 mt-1">';
+
+      q.statements.forEach(s => {
+        const userChoice = currentAnswers[s.id];
+        const isMatch = (userChoice === s.isCorrect);
+        if (!isMatch) allCorrect = false;
+
+        detailedFeedback += `
+          <li class="flex items-start gap-1.5">
+            <i class="fa-solid ${isMatch ? 'fa-check text-emerald-600' : 'fa-xmark text-rose-500'} mt-1"></i>
+            <div>
+              <strong>Ý ${s.text.substring(0, 2)}:</strong> ${s.isCorrect ? 'ĐÚNG' : 'SAI'} 
+              <span class="text-slate-600">(${escapeHtml(s.rationale)})</span>
+            </div>
+          </li>
+        `;
+      });
+      detailedFeedback += '</ul>';
+
+      const feedbackBox = document.getElementById(`feedback-${qId}`);
+      const statusBadge = document.getElementById(`status-${qId}`);
+      statusBadge.classList.remove('hidden');
+      feedbackBox.classList.remove('hidden');
+
+      if (allCorrect) {
+        statusBadge.className = 'status-badge text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>Chính xác 100% (+15đ)';
+        feedbackBox.className = 'mt-3 p-3 rounded-xl text-xs bg-emerald-50 border border-emerald-200 text-emerald-900';
+        feedbackBox.innerHTML = `<strong>Rất xuất sắc!</strong> Em đã nhận định chuẩn xác: ${detailedFeedback}`;
+        if (!userAnswers[qId]) earnedPoints += 15;
+      } else {
+        statusBadge.className = 'status-badge text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i>Có ý chưa đúng';
+        feedbackBox.className = 'mt-3 p-3 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800';
+        feedbackBox.innerHTML = `<strong>Đối chiếu đáp án chi tiết:</strong> ${detailedFeedback}`;
+      }
+
+      userAnswers[qId] = { correct: allCorrect };
+      updateScoreCounter();
+    }
+
+    // Short Answer Handler
+    function checkShortAnswer(qId, subject) {
+      const q = questionBank[subject].find(item => item.id === qId);
+      if (!q) return;
+
+      const inputVal = (document.getElementById(`input-${qId}`).value || '').trim().toLowerCase().replace(/\s+/g, '');
+      if (!inputVal) {
+        showToast('Em vui lòng nhập đáp án vào ô trống trước nhé!');
+        return;
+      }
+
+      const isCorrect = q.expected.some(exp => {
+        const cleanExp = exp.toLowerCase().replace(/\s+/g, '');
+        return inputVal === cleanExp;
+      });
+
+      const feedbackBox = document.getElementById(`feedback-${qId}`);
+      const statusBadge = document.getElementById(`status-${qId}`);
+      statusBadge.classList.remove('hidden');
+      feedbackBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        statusBadge.className = 'status-badge text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>Chính xác (+10đ)';
+        feedbackBox.className = 'mt-3 p-3 rounded-xl text-xs bg-emerald-50 border border-emerald-200 text-emerald-900';
+        feedbackBox.innerHTML = `<strong>Chính xác!</strong> ${escapeHtml(q.explanation)}`;
+        if (!userAnswers[qId]) earnedPoints += 10;
+      } else {
+        statusBadge.className = 'status-badge text-xs font-semibold px-2 py-0.5 rounded-md bg-rose-100 text-rose-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i>Chưa chính xác';
+        feedbackBox.className = 'mt-3 p-3 rounded-xl text-xs bg-rose-50 border border-rose-200 text-rose-900';
+        feedbackBox.innerHTML = `<strong>Đáp án đúng: ${q.expected[0]}</strong>. ${escapeHtml(q.explanation)}`;
+      }
+
+      userAnswers[qId] = { isCorrect: isCorrect };
+      updateScoreCounter();
+    }
+
+    // Essay Handlers
+    function toggleEssayModel(qId) {
+      const modelBox = document.getElementById(`essay-model-${qId}`);
+      modelBox.classList.toggle('hidden');
+    }
+
+    function markSelfEssay(qId, isPassed) {
+      const statusBadge = document.getElementById(`status-${qId}`);
+      statusBadge.classList.remove('hidden');
+
+      if (isPassed) {
+        statusBadge.className = 'status-badge text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-award mr-1"></i>Đã đạt (+20đ)';
+        if (!userAnswers[qId]) earnedPoints += 20;
+      } else {
+        statusBadge.className = 'status-badge text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-rotate-right mr-1"></i>Cần rèn luyện thêm';
+      }
+
+      userAnswers[qId] = { isPassed: isPassed };
+      updateScoreCounter();
+    }
+
+    function toggleHint(qId) {
+      const hintBox = document.getElementById(`hint-${qId}`);
+      hintBox.classList.toggle('hidden');
+    }
+
+    function updateScoreCounter() {
+      document.getElementById('score-counter').innerText = earnedPoints;
+    }
+
+    function updateCounters() {
+      document.getElementById('phys-count').innerText = `${questionBank.physics.length} bài`;
+      document.getElementById('chem-count').innerText = `${questionBank.chemistry.length} bài`;
+      document.getElementById('bio-count').innerText = `${questionBank.biology.length} bài`;
+    }
+
+    function resetAllProgress() {
+      showConfirmModal('Em có chắc chắn muốn làm lại từ đầu không? Toàn bộ điểm số và bài làm KHTN 9 sẽ được thiết lập lại.', () => {
+        earnedPoints = 0;
+        userAnswers = {};
+        tfState = {};
+        renderAllSubjects();
+        updateScoreCounter();
+        filterType('all');
+        showToast('Đã thiết lập lại bài ôn tập từ đầu!');
+      });
+    }
+
+    // Modal & Toast Utilities
+    function showToast(message) {
+      const toast = document.getElementById('toast-box');
+      const toastText = document.getElementById('toast-text');
+      if (!toast || !toastText) return;
+      toastText.innerText = message;
+      toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
+    function showConfirmModal(text, onConfirm) {
+      const modal = document.getElementById('custom-modal');
+      const desc = document.getElementById('modal-desc');
+      const confirmBtn = document.getElementById('modal-confirm-btn');
+      const cancelBtn = document.getElementById('modal-cancel-btn');
+      if (!modal || !desc || !confirmBtn || !cancelBtn) return;
+      
+      desc.innerText = text;
+      modal.classList.remove('hidden');
+
+      const handleConfirm = () => {
+        modal.classList.add('hidden');
+        confirmBtn.removeEventListener('click', handleConfirm);
+        cancelBtn.removeEventListener('click', handleCancel);
+        if (onConfirm) onConfirm();
+      };
+
+      const handleCancel = () => {
+        modal.classList.add('hidden');
+        confirmBtn.removeEventListener('click', handleConfirm);
+        cancelBtn.removeEventListener('click', handleCancel);
+      };
+
+      confirmBtn.addEventListener('click', handleConfirm);
+      cancelBtn.addEventListener('click', handleCancel);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
